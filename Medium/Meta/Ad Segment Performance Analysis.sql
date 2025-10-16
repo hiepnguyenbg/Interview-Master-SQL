@@ -88,10 +88,11 @@ order by 2 desc;
 
 select segment_name, sum(ad_spend)/sum(conversions) as cost_per_conversion
 from ad_performance ap
-join audience_segments ase on ap.audience_segment_id = ase.audience_segment_id
+join audience_segments as on ap.audience_segment_id = as.audience_segment_id
 where segment_name like '%custom%' or segment_name like '%lookalike%'
 group by 1
 having sum(ad_spend) <>0 and sum(conversions)<>0
 order by 2 desc;
 
-
+-- By analyzing these key metrics—impressions, conversions, and cost per conversion—you've helped provide actionable 
+-- insights that Meta's Marketing Performance team can use to optimize advertising strategies and improve campaign efficiency.
