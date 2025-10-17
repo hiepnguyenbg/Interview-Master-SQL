@@ -139,16 +139,25 @@ WHERE n_rnk = 1;
 -- Question 3: We need to identify potential gaps in our supply chain for Asia. 
 -- List all suppliers by name who have not delivered any components to the 'Asia' manufacturing region in December 2024.
 
-WITH dec_supply AS (
-  SELECT supplier_id
+-- WITH dec_supply AS (
+--   SELECT supplier_id
+--   FROM supplier_deliveries
+--   WHERE delivery_date BETWEEN '2024-12-01' AND '2024-12-31'
+--     AND manufacturing_region = 'Asia'
+-- )
+
+-- SELECT s.supplier_name
+-- FROM suppliers s
+-- LEFT JOIN dec_supply ds ON s.supplier_id = ds.supplier_id
+-- WHERE ds.supplier_id IS NULL;
+
+
+SELECT supplier_name
+FROM suppliers 
+WHERE supplier_id NOT IN (
+    SELECT supplier_id
   FROM supplier_deliveries
   WHERE delivery_date BETWEEN '2024-12-01' AND '2024-12-31'
-    AND manufacturing_region = 'Asia'
-)
-
-SELECT s.supplier_name
-FROM suppliers s
-LEFT JOIN dec_supply ds ON s.supplier_id = ds.supplier_id
-WHERE ds.supplier_id IS NULL;
+    AND manufacturing_region = 'Asia');
 
 
