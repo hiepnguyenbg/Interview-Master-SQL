@@ -119,11 +119,11 @@ WITH supplier_totals AS (
   SELECT 
   manufacturing_region,
   supplier_id,
+  SUM(component_count) AS total_supply,
   RANK() OVER (
     PARTITION BY manufacturing_region 
     ORDER BY SUM(component_count) DESC
-  ) AS n_rnk,
-  SUM(component_count) AS total_supply
+  ) AS n_rnk
 FROM supplier_deliveries
 WHERE delivery_date BETWEEN '2024-11-01' AND '2024-11-30'
 GROUP BY manufacturing_region, supplier_id
