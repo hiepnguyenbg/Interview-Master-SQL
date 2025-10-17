@@ -161,3 +161,6 @@ WHERE supplier_id NOT IN (
     AND manufacturing_region = 'Asia');
 
 
+-- By analyzing supplier activity, regional dominance, and supply gaps, your insights will help Apple optimize vendor selection 
+-- and mitigate supply chain risks effectively.
+
