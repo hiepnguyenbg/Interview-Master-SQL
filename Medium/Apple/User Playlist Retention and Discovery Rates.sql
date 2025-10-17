@@ -95,7 +95,7 @@ WITH oct_users AS (
     HAVING SUM(is_recommended) > 0
 )
 SELECT 
-    ROUND(SUM(total_recommended) * 1.0 / COUNT(user_id), 1) AS avg_recommended
+    ROUND(AVG(total_recommended), 1) AS avg_recommended
 FROM oct_users;
 
 -- Question 3: Can you give us the name(s) of users who added a non-recommended track to their playlist on October 2nd, 2024?
