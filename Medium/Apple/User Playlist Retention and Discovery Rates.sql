@@ -106,4 +106,17 @@ JOIN users u ON ta.user_id = u.user_id
 WHERE added_date = '2024-10-02'
   AND is_recommended = 0;
 
+-- SELECT user_name
+-- FROM users
+-- WHERE user_id IN (
+--     SELECT user_id 
+--     FROM tracks_added
+--     WHERE added_date = '2024-10-02'
+--       AND is_recommended IS FALSE
+-- );
+
+
+-- Your analyses will help Apple Music's Personalization Team understand user engagement with recommended tracks and identify 
+-- users who add non-recommended tracks. This insight is crucial for refining the recommendation engine to boost user retention
+-- and satisfaction.
 
