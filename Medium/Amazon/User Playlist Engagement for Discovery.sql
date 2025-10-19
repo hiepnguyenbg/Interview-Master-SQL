@@ -100,6 +100,20 @@ ORDER BY avg_listening_time_per_track
 LIMIT 1;
 
 
+-- SELECT 
+--     pl.playlist_name,
+--     ROUND(SUM(pe.listening_time_minutes)::numeric / pl.number_of_tracks, 2) AS avg_listening_time_per_track
+-- FROM playlists pl
+-- JOIN playlist_engagement pe 
+--     ON pe.playlist_id = pl.playlist_id
+-- WHERE pe.engagement_date BETWEEN DATE '2024-10-01' AND DATE '2024-10-31'
+-- GROUP BY pl.playlist_id, pl.playlist_name, pl.number_of_tracks
+-- ORDER BY avg_listening_time_per_track
+-- LIMIT 1;
+
+
+
+
 -- Question 3: To optimize our recommendations, we need the average monthly listening time per listener for
 --  each playlist in October 2024. For readability, please round down the average listening time to the nearest whole number.
 
