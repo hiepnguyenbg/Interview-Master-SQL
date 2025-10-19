@@ -107,7 +107,7 @@ LIMIT 1;
 -- JOIN playlist_engagement pe 
 --     ON pe.playlist_id = pl.playlist_id
 -- WHERE pe.engagement_date BETWEEN DATE '2024-10-01' AND DATE '2024-10-31'
--- GROUP BY pl.playlist_id, pl.playlist_name, pl.number_of_tracks
+-- GROUP BY pl.playlist_name, pl.number_of_tracks
 -- ORDER BY avg_listening_time_per_track
 -- LIMIT 1;
 
@@ -117,23 +117,30 @@ LIMIT 1;
 -- Question 3: To optimize our recommendations, we need the average monthly listening time per listener for
 --  each playlist in October 2024. For readability, please round down the average listening time to the nearest whole number.
 
-WITH listening_time_per_user AS (
-    SELECT 
-        playlist_id, 
-        user_id, 
-        SUM(listening_time_minutes) AS total_listening_time
-    FROM playlist_engagement
-    WHERE engagement_date BETWEEN '2024-10-01' AND '2024-10-31'
-    GROUP BY playlist_id, user_id
-)
+-- WITH listening_time_per_user AS (
+--     SELECT 
+--         playlist_id, 
+--         user_id, 
+--         SUM(listening_time_minutes) AS total_listening_time
+--     FROM playlist_engagement
+--     WHERE engagement_date BETWEEN '2024-10-01' AND '2024-10-31'
+--     GROUP BY playlist_id, user_id
+-- )
 
-SELECT 
-    pl.playlist_name,
-    FLOOR(AVG(l.total_listening_time)) AS avg_monthly_listening_per_user
-FROM listening_time_per_user l
-JOIN playlists pl ON l.playlist_id = pl.playlist_id
-GROUP BY pl.playlist_id, pl.playlist_name
-ORDER BY 2 DESC;
+-- SELECT 
+--     pl.playlist_name,
+--     FLOOR(AVG(l.total_listening_time)) AS avg_monthly_listening_per_user
+-- FROM listening_time_per_user l
+-- JOIN playlists pl ON l.playlist_id = pl.playlist_id
+-- GROUP BY pl.playlist_id, pl.playlist_name
+-- ORDER BY 2 DESC;
+
+
+SELECT playlist_id, 
+    FLOOR( SUM(listening_time_minutes) / COUNT(DISTINCT user_id)) as avg_listening
+FROM playlist_engagement
+WHERE engagement_date BETWEEN '2024-10-01' AND '2024-10-31'
+GROUP BY playlist_id;
 
 
 
