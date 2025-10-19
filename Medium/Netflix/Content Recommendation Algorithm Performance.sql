@@ -117,12 +117,18 @@ INSERT INTO fct_recommendations (recommendation_id, user_id, content_id, recomme
 -- we want to use the first date that the content was recommended to a user.
 
 
-SELECT SUM(fwh.watch_time_minutes) AS total_watch_time_after_recommendation
+WITH first_recommendation AS (
+  SELECT user_id, content_id, MIN(recommended_date) AS earliest_recommended_date
+  FROM fct_recommendations
+  GROUP BY user_id, content_id
+)
+SELECT SUM(fwh.watch_time_minutes) AS total_watch_time
 FROM fct_watch_history fwh
-JOIN fct_recommendations fr
+JOIN first_recommendation fr
   ON fwh.user_id = fr.user_id
  AND fwh.content_id = fr.content_id
-WHERE fwh.watch_date > fr.recommended_date;
+WHERE fwh.watch_date >= fr.earliest_recommended_date;
+
 
 
 -- Question 2: The team wants to know the total watch time for each genre in first quarter of 2024, 
