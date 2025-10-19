@@ -134,34 +134,14 @@ WITH at_least_one AS (
         AND us.artist_id = ar.artist_id
     WHERE us.stream_date >= ar.recommendation_date
     GROUP BY us.user_id
-    HAVING COUNT(us.artist_id) >= 1
 )
 SELECT ROUND(AVG(n_distinct_artist), 2) 
 FROM at_least_one;
 
 
 
-
--- WITH user_artist_streams AS (
---     SELECT
---         us.user_id,
---         us.artist_id
---     FROM user_streams us
---     JOIN artist_recommendations ar 
---         ON us.user_id = ar.user_id 
---         AND us.artist_id = ar.artist_id
---     WHERE us.stream_date >= ar.recommendation_date
--- ),
--- user_artist_counts AS (
---     SELECT
---         user_id,
---         COUNT(DISTINCT artist_id) AS n_distinct_artists
---     FROM user_artist_streams
---     GROUP BY user_id
--- )
--- SELECT 
---     ROUND(AVG(n_distinct_artists), 1) AS avg_distinct_recommended_artists
--- FROM user_artist_counts;
+-- Your analyses will help Apple Music's Personalization Team understand how users engage with recommended artists, which is crucial for 
+-- improving the recommendation algorithm and ultimately enhancing user satisfaction and engagement.
 
 
 
