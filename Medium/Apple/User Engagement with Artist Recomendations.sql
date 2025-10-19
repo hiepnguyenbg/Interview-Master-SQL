@@ -99,6 +99,24 @@ SELECT
 FROM number_streamed;
 
 
+-- WITH Cte AS (
+--     SELECT 
+--         Us.Artist_Id, 
+--         COUNT(Us.Stream_Id) AS Total_Stream
+--     FROM User_Streams Us
+--     JOIN Artist_Recommendations Ar
+--         ON Us.User_Id = Ar.User_Id
+--        AND Us.Artist_Id = Ar.Artist_Id
+--     WHERE Us.Stream_Date >= Ar.Recommendation_Date
+--       AND Us.Stream_Date BETWEEN '2024-05-01' AND '2024-05-31'
+--     GROUP BY Us.Artist_Id
+-- )
+-- SELECT 
+--     AVG(Total_Stream) AS Avg_Streams_Per_Recommended_Artist
+-- FROM Cte;
+
+
+
 
 -- Question 3: Across users who listened to at least one recommended artist, what is the average number of distinct recommended artists 
 -- they listened to? As in the previous question, only include streams that occurred on or after the date the artist was 
