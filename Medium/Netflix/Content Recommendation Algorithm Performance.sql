@@ -113,7 +113,8 @@ INSERT INTO fct_recommendations (recommendation_id, user_id, content_id, recomme
 
 -- Question 1: What is the total watch time for content after it was recommended to users? To correctly 
 -- attribute watch time to the recommendation, it is critical to only include watch time after the 
--- recommendation was made to the user.
+-- recommendation was made to the user. A content could get recommended to a user multiple times. If so, 
+-- we want to use the first date that the content was recommended to a user.
 
 
 SELECT SUM(fwh.watch_time_minutes) AS total_watch_time_after_recommendation
