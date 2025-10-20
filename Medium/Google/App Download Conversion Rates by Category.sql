@@ -105,24 +105,30 @@ INSERT INTO fct_app_downloads (app_id, download_date, download_count) VALUES
 -- Question 1: The marketplace team wants to identify high and low performing app categories. Provide the total 
 -- downloads for the app categories for November 2024. If there were no downloads for that category, return the value as 0.
 
-WITH download_category AS (
-    SELECT 
-        da.category,
-        IFNULL(fad.download_count, 0) AS download_count
-    FROM dim_app da
-    LEFT JOIN fct_app_downloads fad 
-        ON da.app_id = fad.app_id
-        AND fad.download_date BETWEEN '2024-11-01' AND '2024-11-30'
-)
+-- WITH download_category AS (
+--     SELECT 
+--         da.category,
+--         IFNULL(fad.download_count, 0) AS download_count
+--     FROM dim_app da
+--     LEFT JOIN fct_app_downloads fad 
+--         ON da.app_id = fad.app_id
+--         AND fad.download_date BETWEEN '2024-11-01' AND '2024-11-30'
+-- )
 
-SELECT 
-    category, 
-    SUM(download_count) AS total_download
-FROM download_category
+-- SELECT 
+--     category, 
+--     SUM(download_count) AS total_download
+-- FROM download_category
+-- GROUP BY category
+-- ORDER BY total_download DESC;
+
+SELECT category, SUM(COALESCE(download_count,0)) AS total_download
+FROM dim_app da 
+LEFT JOIN fct_app_downloads fad
+ON da.app_id = fad.app_id
+AND download_date BETWEEN '2024-11-01' AND '2024-11-30'
 GROUP BY category
 ORDER BY total_download DESC;
-
-
 
 
 -- Question 2: Our team's goal is download conversion rate — defined as downloads per browse event. For each 
