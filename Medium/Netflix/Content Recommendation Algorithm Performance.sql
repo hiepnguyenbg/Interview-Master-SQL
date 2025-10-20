@@ -178,8 +178,6 @@ WITH length_classification AS (
       ELSE 'Long'
     END AS category
   FROM fct_watch_history fwh
-  JOIN dim_content dc 
-    ON fwh.content_id = dc.content_id
   JOIN fct_recommendations fr
     ON fwh.user_id = fr.user_id 
    AND fwh.content_id = fr.content_id
