@@ -136,41 +136,41 @@ ORDER BY total_download DESC;
 
 
 
--- WITH total_browsing AS (
---     SELECT app_id, SUM(browse_count) AS total_browsing
---     FROM fct_app_browsing
---     WHERE browse_date BETWEEN '2024-12-01' AND '2024-12-31'
---     GROUP BY app_id
--- ),
--- total_downloads AS (
---     SELECT app_id, SUM(download_count) AS total_downloads
---     FROM fct_app_downloads
---     WHERE download_date BETWEEN '2024-12-01' AND '2024-12-31'
---     GROUP BY app_id
--- )
--- SELECT 
---     da.category, 
---     SUM(COALESCE(td.total_downloads, 0)) / SUM(tb.total_browsing) AS conversion_rate
--- FROM dim_app da
--- JOIN total_browsing tb ON da.app_id = tb.app_id
--- LEFT JOIN total_downloads td ON da.app_id = td.app_id
--- GROUP BY da.category
--- HAVING SUM(tb.total_browsing) > 0
--- ORDER BY conversion_rate DESC;
-
-
- SELECT category, 
-  SUM(COALESCE(download_count,0))*1.0/SUM(COALESCE(browse_count,0)) AS conversion_rate
-FROM dim_app da 
-LEFT JOIN fct_app_browsing fab
-ON da.app_id = fab.app_id
-AND browse_date BETWEEN '2024-12-01' AND '2024-12-31'
-LEFT JOIN fct_app_downloads fad
-ON da.app_id = fad.app_id
-AND download_date BETWEEN '2024-12-01' AND '2024-12-31'
-GROUP BY category
-HAVING SUM(COALESCE(browse_count,0)) > 0
+WITH total_browsing AS (
+    SELECT app_id, SUM(browse_count) AS total_browsing
+    FROM fct_app_browsing
+    WHERE browse_date BETWEEN '2024-12-01' AND '2024-12-31'
+    GROUP BY app_id
+),
+total_downloads AS (
+    SELECT app_id, SUM(download_count) AS total_downloads
+    FROM fct_app_downloads
+    WHERE download_date BETWEEN '2024-12-01' AND '2024-12-31'
+    GROUP BY app_id
+)
+SELECT 
+    da.category, 
+    SUM(COALESCE(td.total_downloads, 0)) / SUM(COALESCE(tb.total_browsing,0)) AS conversion_rate
+FROM dim_app da
+JOIN total_browsing tb ON da.app_id = tb.app_id
+LEFT JOIN total_downloads td ON da.app_id = td.app_id
+GROUP BY da.category
+HAVING SUM(COALESCE(tb.total_browsing,0)) > 0
 ORDER BY conversion_rate DESC;
+
+
+--  SELECT category, 
+--   SUM(COALESCE(download_count,0))*1.0/SUM(COALESCE(browse_count,0)) AS conversion_rate
+-- FROM dim_app da 
+-- LEFT JOIN fct_app_browsing fab
+-- ON da.app_id = fab.app_id
+-- AND browse_date BETWEEN '2024-12-01' AND '2024-12-31'
+-- LEFT JOIN fct_app_downloads fad
+-- ON da.app_id = fad.app_id
+-- AND download_date BETWEEN '2024-12-01' AND '2024-12-31'
+-- GROUP BY category
+-- HAVING SUM(COALESCE(browse_count,0)) > 0
+-- ORDER BY conversion_rate DESC;
 
 -- Question 3: The team wants to compare conversion rates between free and premium apps across all 
 -- categories. Combine the conversion data for both app types to present a unified view for Q4 2024.
