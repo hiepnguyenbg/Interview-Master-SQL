@@ -197,3 +197,12 @@ LEFT JOIN total_downloads td ON da.app_id = td.app_id
 GROUP BY da.app_type
 ORDER BY conversion_rate DESC;
 
+
+
+-- These analyses will help the Google Play store's App Marketplace team understand how different app categories and app 
+-- types convert browsing into downloads. This insight is crucial for optimizing product placement and marketing strategies 
+-- to boost downloads and user engagement.
+
+
+
+
