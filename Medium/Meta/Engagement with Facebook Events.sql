@@ -113,7 +113,7 @@ WHERE click_date BETWEEN '2024-03-01' AND '2024-03-31';
 
 
 SELECT du.user_id, CONCAT(du.first_name, ' ', du.last_name) AS full_name, 
-  COALESCE(COUNT(fec.click_id), 0) AS total_clicks
+  COUNT(fec.click_id) AS total_clicks
 FROM dim_users du
 LEFT JOIN fct_event_clicks fec
 ON du.user_id = fec.user_id
