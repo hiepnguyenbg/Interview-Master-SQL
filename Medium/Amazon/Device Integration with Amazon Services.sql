@@ -82,7 +82,7 @@ INSERT INTO fct_device_usage (usage_id, device_id, service_id, usage_date, usage
 
 
 SELECT 
-    SUBSTRING_INDEX(dd.device_name, ' ', 1) AS device_category,
+    SPLIT_PART(dd.device_name, ' ', 1) AS device_category,
     SUM(fdu.usage_duration_minutes) AS total_usage
 FROM fct_device_usage fdu
 JOIN dim_device dd ON fdu.device_id = dd.device_id
@@ -93,23 +93,19 @@ ORDER BY total_usage DESC;
 
 -- Question 2: The team also wants to label the usage of each device category into 'Low' or 'High' based on usage duration 
 -- from July 1, 2024 to September 30, 2024. If the total usage time was less than 300 minutes, we'll categorize it as 'Low'. 
--- Otherwise, we'll categorize it as 'High'.
+-- Otherwise, we'll categorize it as 'High'. Can you return a report with device ID, usage category, and total usage time?
 
 
-WITH total_usage as (
-SELECT 
-    SUBSTRING_INDEX(dd.device_name, ' ', 1) AS device_category,
-    SUM(fdu.usage_duration_minutes) AS total_usage
-FROM fct_device_usage fdu
-JOIN dim_device dd ON fdu.device_id = dd.device_id
-WHERE fdu.usage_date BETWEEN '2024-07-01' AND '2024-09-30'
-GROUP BY device_category)
-SELECT *,
-    CASE 
-        WHEN total_usage < 300 THEN 'Low'
-        ELSE 'High'
-    END AS categorization
-FROM total_usage;
+ SELECT 
+    device_id, 
+   CASE 
+   WHEN SUM(usage_duration_minutes) < 300 THEN 'Low'
+   ELSE 'High' END AS usage_category,
+    SUM(usage_duration_minutes) AS total_usage
+FROM fct_device_usage
+WHERE usage_date BETWEEN '2024-07-01' AND '2024-09-30'
+GROUP BY device_id
+ORDER BY total_usage DESC;
 
 
 -- Question 3: The team is considering bundling the Prime Video and Amazon Music subscription. They want 
@@ -118,7 +114,7 @@ FROM total_usage;
 
 
 WITH prime_music AS (
-  SELECT usage_duration_minutes, service_name
+  SELECT service_name, usage_duration_minutes
   FROM fct_device_usage fdu
   JOIN dim_service ds ON fdu.service_id = ds.service_id
   WHERE fdu.usage_date BETWEEN '2024-07-01' AND '2024-09-30'
@@ -132,6 +128,10 @@ SELECT
 FROM prime_music;
 
 
+
+-- Your analyses will help the Amazon Devices team understand usage patterns by device category, engagement levels, and 
+-- the contribution of key services like Prime Video and Amazon Music. This insight is valuable for optimizing service 
+-- offerings and improving customer satisfaction.
 
 
 
