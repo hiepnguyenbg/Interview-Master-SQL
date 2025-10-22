@@ -124,26 +124,32 @@ WHERE fo.order_date BETWEEN '2024-10-01' AND '2024-12-31'
 -- be missing or zero. Can you compute the average reorder frequency across the product categories, ensuring that any 
 -- missing or null values are appropriately managed for Q4 2024?
 
--- SELECT 
---         dp.category,
---         COUNT(CASE WHEN fo.reorder_flag = 1 THEN 1 END) * 1.0 / 
---         COUNT(fo.order_id) AS reorder_rate
--- FROM dim_products dp
--- LEFT JOIN fct_orders fo 
--- 	ON fo.product_id = dp.product_id
--- 	AND fo.order_date BETWEEN '2024-10-01' AND '2024-12-31'
--- GROUP BY dp.category
--- ORDER BY 2 DESC;
+SELECT 
+        dp.category,
+        COUNT(CASE WHEN fo.reorder_flag = 1 THEN 1 END) * 1.0 / 
+        COUNT(fo.order_id) AS reorder_rate
+FROM dim_products dp
+LEFT JOIN fct_orders fo 
+	ON fo.product_id = dp.product_id
+	AND fo.order_date BETWEEN '2024-10-01' AND '2024-12-31'
+GROUP BY dp.category
+ORDER BY 2 DESC;
 
 
 
-WITH cte AS (
-  SELECT category, COUNT(order_id) AS order_count
-  FROM fct_orders fo
-RIGHT JOIN dim_products dp ON fo.product_id = dp.product_id
-AND fo.order_date BETWEEN '2024-10-01' AND '2024-12-31'
-  AND fo.reorder_flag = 1 
-GROUP BY category 
-)
-SELECT AVG(order_count)
-FROM cte;
+-- WITH cte AS (
+--   SELECT category, COUNT(order_id) AS order_count
+--   FROM fct_orders fo
+-- RIGHT JOIN dim_products dp ON fo.product_id = dp.product_id
+-- AND fo.order_date BETWEEN '2024-10-01' AND '2024-12-31'
+--   AND fo.reorder_flag = 1 
+-- GROUP BY category 
+-- )
+-- SELECT AVG(order_count)
+-- FROM cte;
+
+
+
+-- Your analyses will help the Amazon Fresh product team identify which product categories are reordered most frequently, 
+-- understand customer preferences for these products, and calculate the average reorder frequency across categories. 
+-- These insights are valuable for improving customer satisfaction and retention by tailoring reorder experiences and marketing strategies.
