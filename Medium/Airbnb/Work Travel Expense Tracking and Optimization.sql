@@ -98,11 +98,14 @@ LIMIT 5;
 
 
 SELECT 
-  ROUND(100.0 * SUM(CASE WHEN DATEDIFF(travel_date, booking_date) > 30 THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct_long_booking
+  ROUND(100.0 * SUM(CASE WHEN travel_date - booking_date > 30 THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct_long_booking
 FROM fct_corporate_bookings
 WHERE booking_date BETWEEN '2024-02-01' AND '2024-02-28';
 
 
+
+-- By analyzing average booking costs, company-specific spending behaviors, and booking timing, your insights can help 
+-- Airbnb for Work optimize corporate travel expenses and identify cost-saving opportunities.
 
 
 
