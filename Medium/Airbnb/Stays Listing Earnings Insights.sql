@@ -93,22 +93,43 @@ WHERE booking_date BETWEEN '2024-07-01' AND '2024-07-31';
 -- have ‘ocean view’ as an amenity? For this analysis, look at bookings that were made in July 2024.
 
 
-WITH earnings_per_listing AS (
+-- WITH earnings_per_listing AS (
+--   SELECT
+--     listing_id,
+--     SUM(nightly_price * booked_nights + IFNULL(cleaning_fee, 0)) AS total_earnings
+--   FROM fct_bookings
+--   WHERE booking_date BETWEEN '2024-07-01' AND '2024-07-31'
+--   GROUP BY listing_id
+-- ),
+-- ranked_listings AS (
+--   SELECT *,
+--          PERCENT_RANK() OVER (ORDER BY total_earnings DESC) AS percentile
+--   FROM earnings_per_listing
+-- )
+-- SELECT ROUND(100.0*SUM(CASE WHEN amenities LIKE '%ocean view%' THEN 1 END) /COUNT(*),2) as pct_ocean_view
+-- FROM ranked_listings rl
+-- JOIN dim_listings dl ON rl.listing_id = dl.listing_id
+-- WHERE percentile <= 0.5;
+
+
+WITH ranked AS (
   SELECT
-    listing_id,
-    SUM(nightly_price * booked_nights + IFNULL(cleaning_fee, 0)) AS total_earnings
-  FROM fct_bookings
+    l.listing_id,
+    dl.amenities,
+    PERCENT_RANK() OVER (ORDER BY SUM(nightly_price * booked_nights + COALESCE(cleaning_fee, 0)) DESC) AS pct_rank
+  FROM fct_bookings l
+  JOIN dim_listings dl ON l.listing_id = dl.listing_id
   WHERE booking_date BETWEEN '2024-07-01' AND '2024-07-31'
-  GROUP BY listing_id
-),
-ranked_listings AS (
-  SELECT *,
-         PERCENT_RANK() OVER (ORDER BY total_earnings DESC) AS percentile
-  FROM earnings_per_listing
+  GROUP BY l.listing_id, dl.amenities
 )
-SELECT ROUND(100.0*SUM(CASE WHEN amenities LIKE '%ocean view%' THEN 1 END) /COUNT(*),2) as pct_ocean_view
-FROM ranked_listings rl
-JOIN dim_listings dl ON rl.listing_id = dl.listing_id
-WHERE percentile <= 0.5;
+SELECT 
+  ROUND(
+    100.0 * SUM(CASE WHEN amenities LIKE '%ocean view%' THEN 1 ELSE 0 END) 
+            / COUNT(*), 
+    2
+  ) AS pct_ocean_view
+FROM ranked
+WHERE pct_rank <= 0.5;
+
 
 
