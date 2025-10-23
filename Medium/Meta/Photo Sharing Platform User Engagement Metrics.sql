@@ -83,12 +83,13 @@ WHERE (du.age < 18 OR du.age > 50)
 -- Question 2: What are the user IDs and the total number of photos shared by users who are not from the United States 
 -- during August 2024?  This analysis will help us identify engagement patterns among international users.
 
-SELECT fps.user_id, COUNT(fps.photo_id) AS n_photos
-FROM fct_photo_sharing fps
-JOIN dim_user du ON fps.user_id = du.user_id
-WHERE du.country <> 'United States'
-  AND fps.shared_date BETWEEN '2024-08-01' AND '2024-08-31'
-GROUP BY fps.user_id;
+SELECT du.user_id, COUNT(photo_id) AS num_photos
+FROM dim_user du
+LEFT JOIN fct_photo_sharing fps ON fps.user_id = du.user_id
+AND fps.shared_date BETWEEN '2024-08-01' AND '2024-08-31'
+WHERE country <> 'United States'
+GROUP BY du.user_id
+ORDER BY 2 DESC, 1;
 
 
 -- Question 3: What is the total number of photos shared by users who are either under 18 years old or over 50 years
@@ -99,12 +100,14 @@ GROUP BY fps.user_id;
 SELECT COUNT(fps.photo_id) AS n_photos
 FROM fct_photo_sharing fps
 JOIN dim_user du ON fps.user_id = du.user_id
-WHERE du.country <> 'United States'
-  AND fps.shared_date BETWEEN '2024-07-01' AND '2024-09-30'
+WHERE fps.shared_date BETWEEN '2024-07-01' AND '2024-09-30'
+  AND du.country <> 'United States'
   AND (du.age < 18 OR du.age > 50);
 
 
-
+-- Your analyses will help Meta's Facebook Photos team understand how key user segments—those under 18 or over 50, and 
+-- international users—are engaging with the photo sharing feature. These insights can guide product strategies to 
+-- better tailor features and boost engagement among these important groups.
 
 
 
