@@ -113,7 +113,9 @@ GROUP BY merchant_category;
 
 
 
-
+-- Your analyses will help the Google Pay security team identify merchant categories with varying transaction success 
+-- and failure patterns, enabling them to pinpoint friction points and prioritize improvements for a smoother, more 
+-- reliable payment experience.
 
 
 
