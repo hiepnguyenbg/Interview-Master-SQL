@@ -66,21 +66,31 @@ INSERT INTO fct_file_sharing (file_id, file_name, shared_date, organization_id, 
 
 -- Question 1: What is the average length of the file names shared for each organizational segment in January 2024?
 
-WITH name_len AS (
-  SELECT 
-    dio.segment, 
-    CHAR_LENGTH(ffs.file_name) AS name_len
-  FROM fct_file_sharing ffs
-  JOIN dim_organization dio 
-    ON ffs.organization_id = dio.organization_id
-  WHERE ffs.shared_date BETWEEN '2024-01-01' AND '2024-01-31'
-)
-SELECT 
-  segment, 
-  ROUND(AVG(name_len), 2) AS avg_name_len
-FROM name_len
+-- WITH name_len AS (
+--   SELECT 
+--     dio.segment, 
+--     CHAR_LENGTH(ffs.file_name) AS name_len
+--   FROM fct_file_sharing ffs
+--   JOIN dim_organization dio 
+--     ON ffs.organization_id = dio.organization_id
+--   WHERE ffs.shared_date BETWEEN '2024-01-01' AND '2024-01-31'
+-- )
+-- SELECT 
+--   segment, 
+--   ROUND(AVG(name_len), 2) AS avg_name_len
+-- FROM name_len
+-- GROUP BY segment
+-- ORDER BY avg_name_len DESC;
+
+
+
+SELECT segment, AVG(LENGTH(file_name)) AS avg_name_length
+FROM fct_file_sharing ffs
+JOIN dim_organization dor
+ON ffs.organization_id = dor.organization_id
+WHERE shared_date BETWEEN '2024-01-01' AND '2024-01-31'
 GROUP BY segment
-ORDER BY avg_name_len DESC;
+ORDER BY avg_name_length DESC;
 
 
 -- Question 2: How many files were shared with names that start with the same prefix as the organization
@@ -91,7 +101,7 @@ FROM fct_file_sharing ffs
 JOIN dim_organization dio 
   ON ffs.organization_id = dio.organization_id
 WHERE ffs.shared_date BETWEEN '2024-02-01' AND '2024-02-28'
-  AND SUBSTRING_INDEX(file_name, '-', 1) = organization_name;
+  AND SPLIT_PART(file_name, '-', 1) = organization_name;
 
 
 
@@ -111,4 +121,7 @@ LIMIT 3;
 
 
 
+-- By identifying the top organizational segments with the highest number of files shared without co-editing users, 
+-- you’re helping the security team pinpoint where potential risks might be concentrated. This analysis will guide 
+-- targeted improvements in Microsoft Teams’ file sharing and co-editing features to enhance data security.
 
