@@ -72,14 +72,24 @@ INSERT INTO fct_checkout_times (store_id, transaction_id, checkout_end_time, che
 
 
 
-SELECT 
-  ds.store_name,
-  AVG(TIMESTAMPDIFF(MINUTE, fct.checkout_start_time, fct.checkout_end_time)) AS avg_checkout_minutes
+-- SELECT 
+--   ds.store_name,
+--   AVG(TIMESTAMPDIFF(MINUTE, fct.checkout_start_time, fct.checkout_end_time)) AS avg_checkout_minutes
+-- FROM fct_checkout_times fct
+-- JOIN dim_stores ds ON fct.store_id = ds.store_id
+-- WHERE DATE(fct.checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
+-- GROUP BY ds.store_name
+-- ORDER BY avg_checkout_minutes DESC;
+
+
+SELECT store_name, 
+  AVG(EXTRACT(EPOCH FROM (checkout_end_time - checkout_start_time)) / 60) avg_checkout
 FROM fct_checkout_times fct
-JOIN dim_stores ds ON fct.store_id = ds.store_id
-WHERE DATE(fct.checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
-GROUP BY ds.store_name
-ORDER BY avg_checkout_minutes DESC;
+JOIN dim_stores ds
+ON fct.store_id = ds.store_id
+WHERE DATE_TRUNC('day', checkout_start_time) BETWEEN '2024-07-01' AND '2024-07-31'
+GROUP BY 1
+ORDER BY 2 DESC;
 
 
 
