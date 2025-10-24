@@ -100,26 +100,45 @@ ORDER BY 2 DESC;
 
 
 
-WITH store_avg_wait AS (
-  SELECT 
-    store_id,
-    AVG(TIMESTAMPDIFF(MINUTE, checkout_start_time, checkout_end_time)) AS avg_checkout_minutes
-  FROM fct_checkout_times
-  WHERE DATE(checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
-  GROUP BY store_id
-  HAVING avg_checkout_minutes > 10
-)
+-- WITH store_avg_wait AS (
+--   SELECT 
+--     store_id,
+--     AVG(TIMESTAMPDIFF(MINUTE, checkout_start_time, checkout_end_time)) AS avg_checkout_minutes
+--   FROM fct_checkout_times
+--   WHERE DATE(checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
+--   GROUP BY store_id
+--   HAVING avg_checkout_minutes > 10
+-- )
 
-SELECT 
-  ds.store_name,
-  HOUR(fct.checkout_start_time) AS hour_of_day,
-  AVG(TIMESTAMPDIFF(MINUTE, fct.checkout_start_time, fct.checkout_end_time)) AS avg_checkout_minutes
+-- SELECT 
+--   ds.store_name,
+--   HOUR(fct.checkout_start_time) AS hour_of_day,
+--   AVG(TIMESTAMPDIFF(MINUTE, fct.checkout_start_time, fct.checkout_end_time)) AS avg_checkout_minutes
+-- FROM fct_checkout_times fct
+-- JOIN store_avg_wait sw ON fct.store_id = sw.store_id
+-- JOIN dim_stores ds ON fct.store_id = ds.store_id
+-- WHERE DATE(fct.checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
+-- GROUP BY ds.store_name, hour_of_day
+-- ORDER BY avg_checkout_minutes DESC;
+
+
+
+WITH avg_checkout_time AS (
+    SELECT store_id
+    FROM fct_checkout_times
+    WHERE DATE_TRUNC('day', checkout_start_time) BETWEEN '2024-07-01' AND '2024-07-31'
+    GROUP BY store_id
+    HAVING AVG(EXTRACT(EPOCH FROM (checkout_end_time - checkout_start_time)) / 60) > 10
+)
+SELECT store_name, 
+    EXTRACT(HOUR FROM checkout_end_time) AS checkout_hour,
+    AVG(EXTRACT(EPOCH FROM (checkout_end_time - checkout_start_time)) / 60) AS avg_checkout
 FROM fct_checkout_times fct
-JOIN store_avg_wait sw ON fct.store_id = sw.store_id
 JOIN dim_stores ds ON fct.store_id = ds.store_id
-WHERE DATE(fct.checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
-GROUP BY ds.store_name, hour_of_day
-ORDER BY avg_checkout_minutes DESC;
+WHERE fct.store_id IN (SELECT store_id FROM avg_checkout_time)
+AND DATE_TRUNC('day', checkout_start_time) BETWEEN '2024-07-01' AND '2024-07-31'
+GROUP BY store_name, EXTRACT(HOUR FROM checkout_end_time);
+
 
 
 
