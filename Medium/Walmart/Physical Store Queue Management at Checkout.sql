@@ -146,13 +146,24 @@ GROUP BY store_name, EXTRACT(HOUR FROM checkout_end_time);
 -- Question 3: Across all stores in July 2024, which hours exhibit the longest average checkout wait times 
 -- in minutes? This analysis will guide recommendations for optimal staffing strategies.
 
+-- SELECT 
+--   HOUR(fct.checkout_start_time) AS hour_of_day,
+--   AVG(TIMESTAMPDIFF(MINUTE, fct.checkout_start_time, fct.checkout_end_time)) AS avg_checkout_minutes
+-- FROM fct_checkout_times fct
+-- WHERE DATE(fct.checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
+-- GROUP BY hour_of_day
+-- ORDER BY avg_checkout_minutes DESC
+-- LIMIT 1;
+
+
+
 SELECT 
-  HOUR(fct.checkout_start_time) AS hour_of_day,
-  AVG(TIMESTAMPDIFF(MINUTE, fct.checkout_start_time, fct.checkout_end_time)) AS avg_checkout_minutes
-FROM fct_checkout_times fct
-WHERE DATE(fct.checkout_end_time) BETWEEN '2024-07-01' AND '2024-07-31'
-GROUP BY hour_of_day
-ORDER BY avg_checkout_minutes DESC
-LIMIT 1;
+    EXTRACT(HOUR FROM checkout_end_time) AS checkout_hour,
+    AVG(EXTRACT(EPOCH FROM (checkout_end_time - checkout_start_time)) / 60) AS avg_checkout
+FROM fct_checkout_times
+WHERE DATE_TRUNC('day', checkout_start_time) BETWEEN '2024-07-01' AND '2024-07-31'
+GROUP BY EXTRACT(HOUR FROM checkout_end_time)
+ORDER BY avg_checkout DESC;
 
-
+-- Your analyses will help Walmart's Store Operations team identify which stores and specific hours have longer wait 
+-- times, enabling them to optimize staffing and improve the customer shopping experience.
