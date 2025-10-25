@@ -58,7 +58,7 @@ ORDER BY 2 DESC;
 
 SELECT 
   pricing_tier, 
-  round(100*sum(case when renewal_status = 'Renewed' then 1 end) / COUNT(DISTINCT customer_id),2) AS renewal_pct
+  ROUND(100*SUM(CASE WHEN renewal_status = 'Renewed' THEN 1 END) / COUNT(DISTINCT customer_id),2) AS renewal_pct
 FROM fct_subscriptions
 WHERE start_date BETWEEN '2024-07-01' AND '2024-09-30'
 GROUP BY 1
@@ -87,10 +87,28 @@ ORDER BY 2 DESC;
 -- which pricing model keeps customers engaged the longest.
 
 
-SELECT 
+-- SELECT 
+--   pricing_tier, 
+--   ROUND(100*SUM(CASE WHEN renewal_status = 'Renewed' THEN 1 END) / COUNT(DISTINCT customer_id),2) AS renewal_pct,
+--   RANK() OVER (ORDER BY ROUND(100*SUM(CASE WHEN renewal_status = 'Renewed' THEN 1 END) / COUNT(DISTINCT customer_id),2) DESC)
+-- FROM fct_subscriptions
+-- WHERE start_date BETWEEN '2024-07-01' AND '2024-09-30'
+-- GROUP BY 1;
+
+
+ WITH renewal AS (
+   SELECT 
   pricing_tier, 
-  ROUND(100*SUM(CASE WHEN renewal_status = 'Renewed' THEN 1 END) / COUNT(DISTINCT customer_id),2) AS renewal_pct,
-  RANK() OVER (ORDER BY ROUND(100*SUM(CASE WHEN renewal_status = 'Renewed' THEN 1 END) / COUNT(DISTINCT customer_id),2) DESC)
+  100* COUNT(CASE WHEN renewal_status = 'Renewed' THEN 1 END) /
+   COUNT(*) AS pct_renewal
 FROM fct_subscriptions
 WHERE start_date BETWEEN '2024-07-01' AND '2024-09-30'
-GROUP BY 1;
+GROUP BY 1
+ )
+SELECT *, 
+   RANK() OVER( ORDER BY pct_renewal DESC) AS retention_ranking
+FROM renewal;
+
+
+-- Your analyses will help Stripe understand how different pricing tiers perform in terms of customer retention. This insight is crucial 
+-- for refining pricing strategies to maximize customer engagement and lifecycle value.
