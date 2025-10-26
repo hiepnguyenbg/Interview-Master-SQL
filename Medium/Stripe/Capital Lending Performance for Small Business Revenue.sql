@@ -94,19 +94,16 @@ GROUP BY loan_status;
 
 
 
--- SELECT 
---   CASE 
---     WHEN fl.loan_id IS NOT NULL THEN 'Received Loan'
---     ELSE 'Did Not Receive Loan'
---   END AS loan_status,
---   AVG(db.monthly_revenue) AS avg_monthly_revenue
--- FROM dim_businesses db
--- LEFT JOIN fct_loans fl 
---   ON db.business_id = fl.business_id 
---   AND fl.loan_issued_date BETWEEN '2024-01-01' AND '2024-01-31'
--- WHERE db.business_size = 'small'
--- GROUP BY loan_status
--- ORDER BY loan_status;
+-- SELECT AVG(CASE WHEN loan_id IS NOT NULL THEN monthly_revenue END) AS avg_revenue_w_loan,
+--   AVG(CASE WHEN loan_id IS NULL THEN monthly_revenue END) AS avg_revenue_wo_loan
+-- FROM dim_businesses dib
+-- LEFT JOIN 
+--   (SELECT business_id, MIN(loan_id) AS loan_id
+--   FROM fct_loans
+--   WHERE loan_issued_date BETWEEN '2024-01-01' AND '2024-01-31'
+--   GROUP BY business_id) fl 
+-- ON dib.business_id = fl.business_id
+-- WHERE business_size = 'small';
 
 
 
@@ -125,7 +122,7 @@ SELECT
     WHEN db.revenue_variability > 0.3 THEN 'High'
     ELSE 'Medium'
   END AS business_category,
-  ROUND(SUM(CASE WHEN fl.loan_repaid = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(fl.loan_id), 2) AS repayment_rate_pct
+  ROUND(SUM(CAST( fl.loan_repaid AS INT)) * 100.0 / COUNT(fl.loan_id), 2) AS repayment_rate_pct
 FROM fct_loans fl
 JOIN dim_businesses db ON fl.business_id = db.business_id 
 WHERE fl.loan_issued_date BETWEEN '2024-01-01' AND '2024-01-31'
@@ -138,3 +135,6 @@ ORDER BY repayment_rate_pct DESC;
 -- Question 3: For small businesses during January 2024, what is the loan repayment success rate for each revenue 
 -- variability category? Order the results from the highest to the lowest success rate to assess the correlation
 --  between revenue variability and repayment reliability.
+
+
+-- Same answer as in question 2.
