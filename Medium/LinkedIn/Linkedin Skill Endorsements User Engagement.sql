@@ -184,7 +184,7 @@ AND skill_category = 'TECHNICAL'
  
 
 WITH user_endorsements AS (
-    SELECT DISTINCT user_id, skill_category,
+    SELECT user_id, skill_category,
            CASE WHEN endorsement_date BETWEEN '2024-09-01' AND '2024-09-30' THEN 1 ELSE 0 END AS is_sep
     FROM fct_skill_endorsements fse
     JOIN dim_skills ds ON fse.skill_id = ds.skill_id
