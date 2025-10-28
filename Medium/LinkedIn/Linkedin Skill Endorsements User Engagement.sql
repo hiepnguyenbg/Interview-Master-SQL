@@ -91,45 +91,53 @@ INSERT INTO fct_skill_endorsements (user_id, skill_id, endorsement_id, endorseme
 -- Question 1: What percentage of users have at least one skill endorsed by others during July 2024?
 
 
-WITH user_endorsement AS (
-    SELECT DISTINCT user_id
-    FROM fct_skill_endorsements
-    WHERE endorsement_date BETWEEN '2024-07-01' AND '2024-07-31'
-)
-
-SELECT 
-    ROUND(100.0 * COUNT(ue.user_id) / COUNT(du.user_id), 2) AS endorsed_user_pct
-FROM dim_users du
-LEFT JOIN user_endorsement ue 
-    ON du.user_id = ue.user_id;
-
-
--- WITH endorsed_users AS (
+-- WITH user_endorsement AS (
 --     SELECT DISTINCT user_id
 --     FROM fct_skill_endorsements
 --     WHERE endorsement_date BETWEEN '2024-07-01' AND '2024-07-31'
 -- )
 
 -- SELECT 
---     ROUND(100.0 * 
---         (SELECT COUNT(*) FROM endorsed_users) /
---         (SELECT COUNT(*) FROM dim_users), 
---     2) AS endorsed_user_pct;
+--     ROUND(100.0 * COUNT(ue.user_id) / COUNT(du.user_id), 2) AS endorsed_user_pct
+-- FROM dim_users du
+-- LEFT JOIN user_endorsement ue 
+--     ON du.user_id = ue.user_id;
+
+
+SELECT
+  (
+    SELECT COUNT(DISTINCT user_id)
+    FROM fct_skill_endorsements
+    WHERE endorsement_date BETWEEN '2024-07-01' AND '2024-07-31'
+  ) * 100
+  /
+  (
+    SELECT COUNT(DISTINCT user_id)
+    FROM dim_users
+  ) AS endorsement_ratio;
 
 
 -- Question 2: What is the average number of endorsements received per user for skills categorized as 'TECHNICAL' during August 2024?
 
 
-SELECT 
-  AVG(user_endorsements) AS avg_endorsement_count
-FROM (
-  SELECT user_id, COUNT(*) AS user_endorsements
-  FROM fct_skill_endorsements fse
-  JOIN dim_skills ds ON fse.skill_id = ds.skill_id
-  WHERE endorsement_date BETWEEN '2024-08-01' AND '2024-08-31'
-    AND skill_category = 'TECHNICAL'
-  GROUP BY user_id
-) AS sub;
+-- SELECT 
+--   AVG(user_endorsements) AS avg_endorsement_count
+-- FROM (
+--   SELECT user_id, COUNT(*) AS user_endorsements
+--   FROM fct_skill_endorsements fse
+--   JOIN dim_skills ds ON fse.skill_id = ds.skill_id
+--   WHERE endorsement_date BETWEEN '2024-08-01' AND '2024-08-31'
+--     AND skill_category = 'TECHNICAL'
+--   GROUP BY user_id
+-- ) AS sub;
+
+
+
+SELECT COUNT(*) * 1.0 / COUNT(DISTINCT user_id) AS avg_endorsement
+FROM fct_skill_endorsements fse
+JOIN dim_skills ds ON fse.skill_id = ds.skill_id
+WHERE endorsement_date BETWEEN '2024-08-01' AND '2024-08-31'
+AND skill_category = 'TECHNICAL'
 
 
 
