@@ -105,6 +105,7 @@ ORDER BY n_queries DESC
 LIMIT 5;
 
 
-
+-- Your analyses will help OpenAI understand user engagement patterns across different knowledge domains, identify peak query months, and recognize the 
+-- most active users. These insights are valuable for tailoring user experience and prioritizing outreach to highly engaged users.
 
 
