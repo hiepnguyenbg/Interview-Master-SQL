@@ -59,23 +59,29 @@ WHERE route_date BETWEEN '2024-10-01' AND '2024-12-31';
 -- Use a CASE statement to segment the routes accordingly. This analysis will clarify the impact of different 
 -- levels of order clustering on delivery performance.
 
-WITH segmented_routes AS (
-  SELECT 
-    delivery_time,
-    CASE 
-      WHEN pickup_count = 2 THEN 'Two'
-      WHEN pickup_count >= 3 THEN 'At least 3'
-    END AS pickup_group
-  FROM fct_delivery_routes
-  WHERE route_date BETWEEN '2024-10-01' AND '2024-12-31'
-)
+-- WITH segmented_routes AS (
+--   SELECT 
+--     delivery_time,
+--     CASE 
+--       WHEN pickup_count = 2 THEN 'Two'
+--       WHEN pickup_count >= 3 THEN 'At least 3'
+--     END AS pickup_group
+--   FROM fct_delivery_routes
+--   WHERE route_date BETWEEN '2024-10-01' AND '2024-12-31'
+-- )
 
-SELECT 
-  pickup_group, 
-  AVG(delivery_time) AS avg_delivery_time
-FROM segmented_routes
-WHERE pickup_group IS NOT NULL
-GROUP BY pickup_group;
+-- SELECT 
+--   pickup_group, 
+--   AVG(delivery_time) AS avg_delivery_time
+-- FROM segmented_routes
+-- WHERE pickup_group IS NOT NULL
+-- GROUP BY pickup_group;
+
+
+SELECT AVG(CASE WHEN pickup_count = 2 THEN delivery_time END) AS avg_time_2_orders,
+  AVG(CASE WHEN pickup_count >= 3 THEN delivery_time END) AS avg_time_3_or_more_orders
+FROM fct_delivery_routes
+WHERE route_date BETWEEN '2024-10-01' AND '2024-12-31';
 
 
 -- Question 3: What is the average earnings per pickup across all routes?
@@ -85,6 +91,12 @@ GROUP BY pickup_group;
 
 
 SELECT 
-  ROUND(SUM(COALESCE(earnings, (SELECT AVG(earnings) FROM fct_delivery_routes))) / SUM(pickup_count), 2) AS avg_earning
+  SUM(COALESCE(earnings, (SELECT AVG(earnings) FROM fct_delivery_routes))) / SUM(pickup_count) AS avg_earning
 FROM fct_delivery_routes;
+
+
+
+-- Your analyses will help Uber understand how often delivery partners bundle orders, how different levels of order 
+-- clustering impact delivery times, and the average earnings per pickup considering missing data. These insights are 
+-- valuable for optimizing delivery routes to support partner earnings and operational efficiency.
 
