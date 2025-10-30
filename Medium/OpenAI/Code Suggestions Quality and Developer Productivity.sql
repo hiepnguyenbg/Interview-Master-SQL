@@ -86,5 +86,6 @@ ORDER BY avg_combined_metric DESC
 LIMIT 1;
 
 
-
+-- By analyzing these metrics, your team can identify which language-complexity combinations yield the highest productivity and error 
+-- reduction gains, helping to focus improvement efforts where they matter most.
 
