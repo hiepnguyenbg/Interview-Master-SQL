@@ -66,13 +66,18 @@ INSERT INTO fct_social_shares (user_id, share_id, share_date) VALUES
 
 
 
-SELECT FLOOR(AVG(n_transaction)) AS avg_transactions_floor
-FROM (
-    SELECT user_id, COUNT(transaction_id) AS n_transaction
-    FROM fct_transactions
-    WHERE transaction_date BETWEEN '2024-10-01' AND '2024-12-31'
-    GROUP BY user_id
-) AS user_transactions;
+-- SELECT FLOOR(AVG(n_transaction)) AS avg_transactions_floor
+-- FROM (
+--     SELECT user_id, COUNT(transaction_id) AS n_transaction
+--     FROM fct_transactions
+--     WHERE transaction_date BETWEEN '2024-10-01' AND '2024-12-31'
+--     GROUP BY user_id
+-- ) AS user_transactions;
+
+
+SELECT FLOOR( COUNT(*) / COUNT(DISTINCT user_id)) AS avg_transactions
+FROM fct_transactions
+WHERE transaction_date BETWEEN '2024-10-01' AND '2024-12-31';
 
 
 -- Question 2: How many distinct users executed at least one social share between October 1st, 2024 and December 31st, 
@@ -99,14 +104,18 @@ WITH user_group AS (
   FROM fct_transactions
   WHERE transaction_date BETWEEN '2024-10-01' AND '2024-12-31'
   GROUP BY user_id
+  HAVING COUNT(transaction_id) >= 2
 )
 
 SELECT 
   transaction_count, 
   AVG(DATEDIFF(max_date, min_date)) AS avg_datediff
 FROM user_group 
-WHERE transaction_count IS NOT NULL
 GROUP BY transaction_count;
 
+
+-- Your analyses help PayPal's Venmo team understand user engagement patterns by quantifying transaction frequency and timing, 
+-- as well as social sharing behaviors. This insight can guide product decisions to enhance user retention and platform usage 
+-- through social features.
 
 
