@@ -68,7 +68,7 @@ INSERT INTO fct_storyline_interactions (interaction_id, player_id, interaction_d
 
 SELECT 
   dsc.component_name, 
-  COALESCE(COUNT(DISTINCT fsi.player_id), 0) AS n_player
+  COUNT(DISTINCT fsi.player_id)AS n_player
 FROM dim_storyline_components dsc
 LEFT JOIN fct_storyline_interactions fsi 
   ON dsc.storyline_component_id = fsi.storyline_component_id
@@ -81,23 +81,37 @@ ORDER BY n_player DESC;
 -- Question 2: What is the total number of storyline interactions for each storyline component and player combination during 
 -- May 2024? Consider only those players who have interacted with at least two different storyline components.
 
-WITH at_least_two_components AS (
+-- WITH at_least_two_components AS (
+--   SELECT player_id
+--   FROM fct_storyline_interactions
+--   WHERE interaction_date BETWEEN '2024-05-01' AND '2024-05-31'
+--   GROUP BY player_id
+--   HAVING COUNT(DISTINCT storyline_component_id) >= 2
+-- )
+
+-- SELECT 
+--   fsi.storyline_component_id, 
+--   fsi.player_id, 
+--   COUNT(fsi.interaction_id) AS n_interactions
+-- FROM fct_storyline_interactions fsi
+-- JOIN at_least_two_components alt
+--   ON fsi.player_id = alt.player_id
+-- WHERE fsi.interaction_date BETWEEN '2024-05-01' AND '2024-05-31'
+-- GROUP BY fsi.storyline_component_id, fsi.player_id
+-- ORDER BY n_interactions DESC;
+
+
+SELECT storyline_component_id, player_id, COUNT(*) AS n_interactions
+FROM fct_storyline_interactions
+WHERE interaction_date BETWEEN '2024-05-01' AND '2024-05-31'
+AND player_id IN (
   SELECT player_id
   FROM fct_storyline_interactions
   WHERE interaction_date BETWEEN '2024-05-01' AND '2024-05-31'
   GROUP BY player_id
   HAVING COUNT(DISTINCT storyline_component_id) >= 2
 )
-
-SELECT 
-  fsi.storyline_component_id, 
-  fsi.player_id, 
-  COUNT(fsi.interaction_id) AS n_interactions
-FROM fct_storyline_interactions fsi
-JOIN at_least_two_components alt
-  ON fsi.player_id = alt.player_id
-WHERE fsi.interaction_date BETWEEN '2024-05-01' AND '2024-05-31'
-GROUP BY fsi.storyline_component_id, fsi.player_id
+GROUP BY storyline_component_id, player_id
 ORDER BY n_interactions DESC;
 
 
@@ -113,3 +127,7 @@ JOIN fct_storyline_interactions fsi
   ON dsc.storyline_component_id = fsi.storyline_component_id
   AND fsi.interaction_date BETWEEN '2024-05-01' AND '2024-05-31'
 GROUP BY component_name;
+
+
+-- Your analyses will help the Star Wars Game Development team understand which storyline components engage players the most on average, 
+-- allowing them to focus on enhancing those narrative elements to boost player retention and satisfaction.
