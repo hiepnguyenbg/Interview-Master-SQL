@@ -150,12 +150,12 @@ total_downloads AS (
 )
 SELECT 
     da.category, 
-    SUM(COALESCE(td.total_downloads, 0)) / SUM(COALESCE(tb.total_browsing,0)) AS conversion_rate
+    SUM(COALESCE(td.total_downloads, 0)) / SUM(tb.total_browsing) AS conversion_rate
 FROM dim_app da
 JOIN total_browsing tb ON da.app_id = tb.app_id
 LEFT JOIN total_downloads td ON da.app_id = td.app_id
 GROUP BY da.category
-HAVING SUM(COALESCE(tb.total_browsing,0)) > 0
+-- HAVING SUM(COALESCE(tb.total_browsing,0)) > 0
 ORDER BY conversion_rate DESC;
 
 
