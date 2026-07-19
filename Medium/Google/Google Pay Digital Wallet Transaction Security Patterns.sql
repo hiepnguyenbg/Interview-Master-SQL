@@ -67,30 +67,30 @@ GROUP BY merchant_category;
 -- Question 2: For the first quarter of 2024, which merchant categories recorded a transaction success rate below 90%? 
 -- This insight will guide our prioritization of security enhancements to improve payment reliability.
 
-WITH success_category AS (
-  SELECT merchant_category,
-    SUM(CASE WHEN transaction_status = 'SUCCESS' THEN 1 ELSE 0 END) AS n_success,
-    SUM(CASE WHEN transaction_status = 'FAILED' THEN 1 ELSE 0 END) AS n_failure
-  FROM fct_transactions
-  WHERE transaction_date BETWEEN '2024-01-01' AND '2024-03-31'
-  GROUP BY merchant_category
-)
-SELECT
-  merchant_category,
-  ROUND(n_success / (n_success + n_failure), 2) AS success_rate
-FROM success_category
-WHERE (n_success / (n_success + n_failure)) < 0.9;
+-- WITH success_category AS (
+--   SELECT merchant_category,
+--     SUM(CASE WHEN transaction_status = 'SUCCESS' THEN 1 ELSE 0 END) AS n_success,
+--     SUM(CASE WHEN transaction_status = 'FAILED' THEN 1 ELSE 0 END) AS n_failure
+--   FROM fct_transactions
+--   WHERE transaction_date BETWEEN '2024-01-01' AND '2024-03-31'
+--   GROUP BY merchant_category
+-- )
+-- SELECT
+--   merchant_category,
+--   ROUND(n_success / (n_success + n_failure), 2) AS success_rate
+-- FROM success_category
+-- WHERE (n_success / (n_success + n_failure)) < 0.9;
 
 
--- SELECT merchant_category,
---   COUNT(CASE WHEN transaction_status = 'SUCCESS' THEN 1 END)*100.0
---   / COUNT(*) AS success_rate
--- FROM fct_transactions
--- WHERE transaction_date BETWEEN '2024-01-01' AND '2024-03-31'
--- GROUP BY merchant_category
--- HAVING COUNT(CASE WHEN transaction_status = 'SUCCESS' THEN 1 END)*100.0
---   / COUNT(*) < 90
--- ORDER BY 2 DESC;
+SELECT merchant_category,
+    COUNT(CASE WHEN transaction_status = 'SUCCESS' THEN 1 END) * 100.0
+  / COUNT(*) AS success_rate
+FROM fct_transactions
+WHERE transaction_date BETWEEN '2024-01-01' AND '2024-03-31'
+GROUP BY merchant_category
+HAVING COUNT(CASE WHEN transaction_status = 'SUCCESS' THEN 1 END) * 100.0
+     / COUNT(*) < 90
+ORDER BY 2 DESC;
 
 
 -- Question 3: From January 1st to March 31st, 2024, can you generate a list of merchant categories 
