@@ -100,8 +100,8 @@ ORDER BY 2 DESC;
  WITH renewal AS (
    SELECT 
   pricing_tier, 
-  100* COUNT(CASE WHEN renewal_status = 'Renewed' THEN 1 END) /
-   COUNT(*) AS pct_renewal
+  ROUND(100.0 * COUNT(CASE WHEN renewal_status = 'Renewed' THEN 1 END) 
+            / COUNT(*), 2) AS pct_renewal
 FROM fct_subscriptions
 WHERE start_date BETWEEN '2024-07-01' AND '2024-09-30'
 GROUP BY 1
